@@ -1,7 +1,6 @@
 import {
 	Card,
 	CardContent,
-	CardDescription,
 	CardFooter,
 	CardHeader,
 	CardTitle,
@@ -10,7 +9,6 @@ import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
-	DropdownMenuLabel,
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -34,6 +32,7 @@ import {
 	GanttChartIcon,
 	ImageIcon,
 	MoreVertical,
+	StarIcon,
 	TrashIcon,
 } from "lucide-react";
 import { ReactNode, useState } from "react";
@@ -78,7 +77,6 @@ export default function FileCard({ file }: { file: Doc<"files"> }) {
 			<CardFooter className="flex justify-center">
 				<Button
 					onClick={() => {
-						//open a new tab to the file location on convex
 						window.open(getFileUrl(file.fileId), "_blank");
 					}}
 				>
@@ -93,6 +91,7 @@ function FileCardActions({ file }: { file: Doc<"files"> }) {
 	const { toast } = useToast();
 
 	const deleteFile = useMutation(api.files.deleteFile);
+	const toggleFavorite = useMutation(api.files.toggleFavorite);
 	const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 	return (
 		<>
@@ -131,6 +130,19 @@ function FileCardActions({ file }: { file: Doc<"files"> }) {
 					<MoreVertical />
 				</DropdownMenuTrigger>
 				<DropdownMenuContent>
+					<DropdownMenuItem
+						onClick={() => {
+							toggleFavorite({
+								fileId: file._id,
+							});
+						}}
+						className="flex gap-1 items-center cursor-pointer"
+					>
+						<StarIcon size={18} />
+						Favorite
+					</DropdownMenuItem>
+					<DropdownMenuSeparator />
+
 					<DropdownMenuItem
 						onClick={() => {
 							setIsConfirmOpen(true);
