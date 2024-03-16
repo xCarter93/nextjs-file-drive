@@ -40,7 +40,13 @@ import { useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import Image from "next/image";
 
-export default function FileCard({ file }: { file: Doc<"files"> }) {
+export default function FileCard({
+	file,
+	favorites,
+}: {
+	file: Doc<"files">;
+	favorites: Doc<"favorites">[];
+}) {
 	const typeIcons = {
 		image: <ImageIcon />,
 		pdf: <FileTextIcon />,
@@ -50,6 +56,10 @@ export default function FileCard({ file }: { file: Doc<"files"> }) {
 	function getFileUrl(fileId: Id<"_storage">): string {
 		return `${process.env.NEXT_PUBLIC_CONVEX_URL}/api/storage/${fileId}`;
 	}
+
+	const isFavorited = favorites.some(
+		(favorite) => favorite.fileId === file._id
+	);
 	return (
 		<Card>
 			<CardHeader className="relative">
@@ -58,7 +68,7 @@ export default function FileCard({ file }: { file: Doc<"files"> }) {
 					{file.name}
 				</CardTitle>
 				<div className="absolute top-2 right-2">
-					<FileCardActions file={file} />
+					<FileCardActions file={file} isFavorited={isFavorited} />
 				</div>
 				{/* <CardDescription>Card Description</CardDescription> */}
 			</CardHeader>
@@ -87,7 +97,13 @@ export default function FileCard({ file }: { file: Doc<"files"> }) {
 	);
 }
 
-function FileCardActions({ file }: { file: Doc<"files"> }) {
+function FileCardActions({
+	file,
+	isFavorited,
+}: {
+	file: Doc<"files">;
+	isFavorited: boolean;
+}) {
 	const { toast } = useToast();
 
 	const deleteFile = useMutation(api.files.deleteFile);
@@ -138,8 +154,15 @@ function FileCardActions({ file }: { file: Doc<"files"> }) {
 						}}
 						className="flex gap-1 items-center cursor-pointer"
 					>
-						<StarIcon size={18} />
-						Favorite
+						{isFavorited ? (
+							<div className="flex gap-1 items-center">
+								<StarIcon size={20} fill="#FDE047" /> Unfavorite
+							</div>
+						) : (
+							<div className="flex gap-1 items-center">
+								<StarIcon size={20} /> Favorite
+							</div>
+						)}
 					</DropdownMenuItem>
 					<DropdownMenuSeparator />
 
@@ -149,7 +172,7 @@ function FileCardActions({ file }: { file: Doc<"files"> }) {
 						}}
 						className="flex gap-1 text-red-500 items-center cursor-pointer"
 					>
-						<TrashIcon size={18} />
+						<TrashIcon size={20} />
 						Delete
 					</DropdownMenuItem>
 				</DropdownMenuContent>
