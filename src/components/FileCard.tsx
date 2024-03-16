@@ -76,7 +76,14 @@ export default function FileCard({ file }: { file: Doc<"files"> }) {
 				{file.type === "csv" && <GanttChartIcon size={100} />}
 			</CardContent>
 			<CardFooter className="flex justify-center">
-				<Button>Download</Button>
+				<Button
+					onClick={() => {
+						//open a new tab to the file location on convex
+						window.open(getFileUrl(file.fileId), "_blank");
+					}}
+				>
+					Download
+				</Button>
 			</CardFooter>
 		</Card>
 	);
