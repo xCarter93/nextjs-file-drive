@@ -39,6 +39,7 @@ import { ReactNode, useState } from "react";
 import { useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import Image from "next/image";
+import { Protect } from "@clerk/nextjs";
 
 export default function FileCard({
 	file,
@@ -164,17 +165,19 @@ function FileCardActions({
 							</div>
 						)}
 					</DropdownMenuItem>
-					<DropdownMenuSeparator />
 
-					<DropdownMenuItem
-						onClick={() => {
-							setIsConfirmOpen(true);
-						}}
-						className="flex gap-1 text-red-500 items-center cursor-pointer"
-					>
-						<TrashIcon size={20} />
-						Delete
-					</DropdownMenuItem>
+					<Protect role="org:admin" fallback={<></>}>
+						<DropdownMenuSeparator />
+						<DropdownMenuItem
+							onClick={() => {
+								setIsConfirmOpen(true);
+							}}
+							className="flex gap-1 text-red-500 items-center cursor-pointer"
+						>
+							<TrashIcon size={20} />
+							Delete
+						</DropdownMenuItem>
+					</Protect>
 				</DropdownMenuContent>
 			</DropdownMenu>
 		</>
