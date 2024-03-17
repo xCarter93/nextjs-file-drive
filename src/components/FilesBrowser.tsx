@@ -7,6 +7,13 @@ import { api } from "../../convex/_generated/api";
 import UploadButton from "@/components/UploadButton";
 import FileCard from "@/components/FileCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
 
 import Image from "next/image";
 import { GridIcon, Loader2, Table2Icon } from "lucide-react";
@@ -14,6 +21,8 @@ import SearchBar from "@/components/SearchBar";
 import { useState } from "react";
 import { DataTable } from "./file-table/data-table";
 import { columns } from "./file-table/columns";
+import { Doc } from "../../convex/_generated/dataModel";
+import { Label } from "./ui/label";
 
 export default function FilesBrowser({
 	title,
@@ -28,6 +37,7 @@ export default function FilesBrowser({
 	const user = useUser();
 
 	const [query, setQuery] = useState("");
+	const [type, setType] = useState<Doc<"files">["type"] | "all">("all");
 
 	let orgId: string | undefined;
 	if (organization.isLoaded && user.isLoaded) {
@@ -40,7 +50,15 @@ export default function FilesBrowser({
 
 	const files = useQuery(
 		api.files.getFiles,
-		orgId ? { orgId, query, favorites: favoritesOnly, deletedOnly } : "skip"
+		orgId
+			? {
+					orgId,
+					type: type === "all" ? undefined : type,
+					query,
+					favorites: favoritesOnly,
+					deletedOnly,
+			  }
+			: "skip"
 	);
 
 	const modifiedFiles =
@@ -65,16 +83,38 @@ export default function FilesBrowser({
 					</div>
 
 					<Tabs defaultValue="grid">
-						<TabsList className="mb-4">
-							<TabsTrigger value="grid" className="flex gap-2 items-center">
-								<GridIcon size={24} />
-								Grid
-							</TabsTrigger>
-							<TabsTrigger value="table" className="flex gap-2 items-center">
-								<Table2Icon size={24} />
-								Table
-							</TabsTrigger>
-						</TabsList>
+						<div className="flex justify-between items-center">
+							<TabsList className="mb-4">
+								<TabsTrigger value="grid" className="flex gap-2 items-center">
+									<GridIcon size={24} />
+									Grid
+								</TabsTrigger>
+								<TabsTrigger value="table" className="flex gap-2 items-center">
+									<Table2Icon size={24} />
+									Table
+								</TabsTrigger>
+							</TabsList>
+							<div className="flex gap-2 items-center">
+								<Label htmlFor="type-select">Filter by type</Label>
+								<Select
+									value={type}
+									onValueChange={(newType) => {
+										setType(newType as any);
+									}}
+								>
+									<SelectTrigger className="w-[180px]" id="type-select">
+										<SelectValue />
+									</SelectTrigger>
+									<SelectContent>
+										<SelectItem value="all">All</SelectItem>
+										<SelectItem value="image">Image</SelectItem>
+										<SelectItem value="csv">CSV</SelectItem>
+										<SelectItem value="pdf">PDF</SelectItem>
+									</SelectContent>
+								</Select>
+							</div>
+						</div>
+
 						{isLoading && (
 							<div className="flex flex-col gap-8 w-full items-center mt-24 text-gray-500">
 								<Loader2 className="animate-spin" size={128} />
