@@ -4,6 +4,7 @@ const nextConfig = {
 		remotePatterns: [
 			{
 				hostname: "jovial-loris-459.convex.cloud",
+				hostname: "adept-newt-291.convex.cloud",
 			},
 		],
 	},
